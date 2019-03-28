@@ -1,4 +1,3 @@
-from unittest import mock
 from unittest.mock import patch
 
 import pytest
@@ -37,6 +36,8 @@ def test_get_customer_not_found(get_customer, web_client):
 
 @patch('customer_service.model.commands.create_customer')
 def test_create_customer(create_customer, web_client, customer_repository):
+    create_customer.return_value = '98765'
+
     request_body = dict(firstName='Jez', surname='Humble')
 
     response = web_client.post('/customers/', json=request_body)
@@ -44,13 +45,9 @@ def test_create_customer(create_customer, web_client, customer_repository):
     assert response.status_code == 201
 
     create_customer.assert_called_with(
-        customer=mock.ANY,
+        first_name='Jez',
+        surname='Humble',
         customer_repository=customer_repository)
-
-    saved_account = create_customer.mock_calls[0][2]['customer']
-    assert saved_account.customer_id is None
-    assert saved_account.first_name == 'Jez'
-    assert saved_account.surname == 'Humble'
 
     assert response.is_json
 
@@ -59,7 +56,7 @@ def test_create_customer(create_customer, web_client, customer_repository):
     assert account == dict(
         firstName='Jez',
         surname='Humble',
-        customerId='None')  # ID isNone because call is mocked
+        customerId='98765')
 
 
 @pytest.mark.parametrize(

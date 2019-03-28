@@ -22,12 +22,11 @@ def test_get_customer(customer_repository):
 
 
 def test_create_customer(customer_repository):
-    customer = Customer(first_name='Nicole', surname='Forsgren')
+    id = commands.create_customer(first_name='Nicole',
+                                  surname='Forsgren',
+                                  customer_repository=customer_repository)
 
-    commands.create_customer(customer=customer,
-                             customer_repository=customer_repository)
-
-    stored_customer = customer_repository.fetch_by_id(customer.customer_id)
+    stored_customer = customer_repository.fetch_by_id(id)
 
     assert stored_customer.first_name == 'Nicole'
     assert stored_customer.surname == 'Forsgren'

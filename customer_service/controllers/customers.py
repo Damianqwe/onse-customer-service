@@ -4,7 +4,6 @@ from flask import jsonify, Blueprint, current_app, request
 from schema import Schema, SchemaError, And
 
 from customer_service.model import commands
-from customer_service.model.customer import Customer
 from customer_service.model.errors import CustomerNotFound
 
 customers = Blueprint('customers', __name__, url_prefix='/customers/')
@@ -37,16 +36,14 @@ def create_customer():
 
     CREATE_PAYLOAD_SCHEMA.validate(body)
 
-    customer = Customer(first_name=body['firstName'],
-                        surname=body['surname'])
-
-    commands.create_customer(
-        customer=customer,
+    customer_id = commands.create_customer(
+        first_name=body['firstName'],
+        surname=body['surname'],
         customer_repository=customer_repository)
 
-    return jsonify(customerId=str(customer.customer_id),
-                   firstName=customer.first_name,
-                   surname=customer.surname), HTTPStatus.CREATED
+    return jsonify(customerId=str(customer_id),
+                   firstName=body['firstName'],
+                   surname=body['surname']), HTTPStatus.CREATED
 
 
 @customers.errorhandler(CustomerNotFound)
